@@ -75,6 +75,28 @@ function renderCitySelection(matches) {
     });
 }
 
+async function checkAuth() {
+    try {
+        const response = await fetch('/.auth/me');
+        const data = await response.json();
+
+        if (data.clientPrincipal) {
+            document.getElementById('login-link').style.display = 'none';
+            document.getElementById('user-info').style.display = 'inline';
+            document.getElementById('user-name').textContent = data.clientPrincipal.userDetails;
+            return true;
+        } else {
+            document.getElementById('login-link').style.display = 'inline';
+            document.getElementById('user-info').style.display = 'none';
+            return false;
+        }
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        return false;
+    }
+}
+checkAuth();
+
 async function fetchWeather(apiUrl) {
     const output = document.getElementById("forecast");
     try {

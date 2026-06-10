@@ -9,20 +9,28 @@
 <body>
     <h1>Weather App</h1>
 
+    <div id="auth-section">
+        <div id="user-info" style="display: none;">
+            <span id="user-name"></span>
+            <a href="/.auth/logout">Sign Out</a>
+        </div>
+        <a id="login-link" href="/.auth/login/aad">Sign in with Microsoft</a>
+    </div>
+
     <div class="input_section">
 
-    <h2>Search by City</h2>
+        <h2>Search by City</h2>
 
-    <label for="cityInput">City:</label>
-    <input id="cityInput" type="text" placeholder="Olympia" />
+        <label for="cityInput">City:</label>
+        <input id="cityInput" type="text" placeholder="Olympia" />
 
-    <label for="stateInput">State/Province (optional):</label>
-    <input id="stateInput" type="text" placeholder="WA" />
+        <label for="stateInput">State/Province (optional):</label>
+        <input id="stateInput" type="text" placeholder="WA" />
 
-    <label for="countryInput">Country:</label>
-    <input id="countryInput" type="text" placeholder="United States" />
+        <label for="countryInput">Country:</label>
+        <input id="countryInput" type="text" placeholder="United States" />
 
-    <button id="getForecastButton">Get Forecast</button>
+        <button id="getForecastButton">Get Forecast</button>
 
     </div>
 
