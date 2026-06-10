@@ -1,0 +1,71 @@
+.input_section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.input_section h2 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.or_divider {
+    text-align: center;
+    margin: 15px 0;
+    font-weight: bold;
+    opacity:0.7;
+}
+
+.city-selection {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.city-selection h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.city-option {
+    display: block;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.forecast-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.forecast-day {
+    flex: 1;
+    min-width: 120px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.forecast-day img {
+    width: 50px;
+    height: 50px;
+}
+
+.forecast-day h4 {
+    margin: 5px 0;
+}
+
+.forecast-day p {
+    margin: 5px 0;
+    font-size: 14px;
+}

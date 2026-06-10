@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <h1>Weather App</h1>
+
+    <div class="input_section">
+
+    <h2>Search by City</h2>
+
+    <label for="cityInput">City:</label>
+    <input id="cityInput" type="text" placeholder="Olympia" />
+
+    <label for="stateInput">State/Province (optional):</label>
+    <input id="stateInput" type="text" placeholder="WA" />
+
+    <label for="countryInput">Country:</label>
+    <input id="countryInput" type="text" placeholder="United States" />
+
+    <button id="getForecastButton">Get Forecast</button>
+
+    </div>
+
+    <div id="citySelection" class="city-selection" style="display: none;"></div>
+    <div id="forecast" class="forecast-container"></div>
+    <script src="script.js"></script>
+</body>
+</html>
