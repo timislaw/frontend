@@ -16,7 +16,7 @@ document.getElementById("getForecastButton").addEventListener("click", async () 
 
     //  change this back to '/api/GetWeatherForecast' for deployed azure url
     //  testing local url
-    const baseUrl = ""https://weatherappcs350.trafficmanager.net/api/GetWeatherForecast";
+    const baseUrl = "https://weatherappcs350.trafficmanager.net/api/GetWeatherForecast";
 
     apiUrl = `${baseUrl}?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=${encodeURIComponent(country)}`;
     try {
