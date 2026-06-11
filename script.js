@@ -13,6 +13,21 @@ const REGIONS = [
     }
 ];
 
+//const REGIONS = [
+//    {
+//        name: "West US 2",
+//        url: "http://localhost:7011/api/GetWeatherForecast",
+//        healthy: true,
+//        region: "westus2"
+//    },
+//    {
+//        name: "Central US",
+//        url: "http://localhost:7011/api/GetWeatherForecast",
+//        healthy: true,
+//        region: "centralus"
+//    }
+//];
+
 let currentRegionIndex = 0;
 let lastUsedRegion = null;
 
