@@ -11,7 +11,7 @@ document.getElementById("getForecastButton").addEventListener("click", async () 
         citySelection.innerHTML = "";
         citySelection.style.display = "none";
     }
-    const baseUrl = "https://weatherappcs350.trafficmanager.net/api/getweatherforecast";
+    const baseUrl = "http://weatherappcs350.trafficmanager.net/api/getweatherforecast";
 
     const apiUrl = `${baseUrl}?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=${encodeURIComponent(country)}`;
     try {
@@ -60,7 +60,7 @@ function renderCitySelection(matches) {
         const selected = document.querySelector('input[name="cityRadio"]:checked');
         if (selected) {
             const [lat, lon] = selected.value.split(",");
-            const apiUrl = `https://weatherappcs350.trafficmanager.net/api/getweatherforecast?lat=${lat}&lon=${lon}`;
+            const apiUrl = `http://weatherappcs350.trafficmanager.net/api/getweatherforecast?lat=${lat}&lon=${lon}`;
 
             const output = document.getElementById("forecast");
             if (output) output.innerHTML = "Loading forecast...";
