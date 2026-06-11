@@ -113,10 +113,10 @@ function renderCitySelection(matches) {
     let html = `<h3>Multiple matches found. Please select your city:</h3>`;
 
     matches.forEach((match, index) => {
-        const locationString = `${match.name}, ${match.state ? match.state + ', ' : ''}${match.country} (${match.lat}, ${match.lng})`;
+        const locationString = `${match.Name}, ${match.State ? match.State + ', ' : ''}${match.Country} (${match.Lat}, ${match.Lng})`;
         html += `
             <label class="city-option">
-                <input type="radio" name="cityRadio" value="${match.lat},${match.lng}" ${index === 0 ? 'checked' : ''}>
+                <input type="radio" name="cityRadio" value="${match.Lat},${match.Lng}" ${index === 0 ? 'checked' : ''}>
                 ${locationString}
             </label>
         `;
