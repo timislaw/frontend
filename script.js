@@ -1,3 +1,64 @@
+const REGIONS = [
+    {
+        name: "West US 2",
+        url: "https://weatherapp20260602190007-cnawcze6hgfeczbf.westus2-01.azurewebsites.net/api/getweatherforecast",
+        healthy: true,
+        region: "westus2"
+    },
+    {
+        name: "Central US",
+        url: "https://weatherapp20260602191313-acbbb8hrbge4fvfj.centralus-01.azurewebsites.net/api/getweatherforecast",
+        healthy: true,
+        region: "centralus"
+    }
+];
+
+let currentRegionIndex = 0;
+let lastUsedRegion = null;
+
+async function callWeatherAPI(city, state, country) {
+    for (let attempt = 0; attempt < REGIONS.length; attempt++) {
+        const region = REGIONS[currentRegionIndex];
+
+        try {
+            const url = `${region.url}?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=${encodeURIComponent(country)}`;
+            console.log(`Attempting to use region: ${region.name}`);
+
+            const response = await fetch(url);
+
+            if (response.ok) {
+                const data = await response.json();
+                lastUsedRegion = region.name;
+                console.log(`Successfully used region: ${region.name}`);
+                return data;
+            } else {
+                console.log(`Region ${region.name} returned error: ${response.status}`);
+                region.healthy = false;
+            }
+        } catch (error) {
+            console.log(`Region ${region.name} failed: ${error.message}`);
+            region.healthy = false;
+        }
+
+        currentRegionIndex = (currentRegionIndex + 1) % REGIONS.length;
+    }
+
+    throw new Error("All regions are unavailable");
+}
+
+function updateRoutingStatus() {
+    const statusDiv = document.getElementById("routing-status");
+    if (statusDiv) {
+        statusDiv.innerHTML = `
+            <div class="routing-info">
+                <strong>Geo-Redundant Routing:</strong><br>
+                ${REGIONS.map(r => `${r.name}: ${r.healthy ? '✅ Active' : '⚠️ Degraded'}`).join(' | ')}
+                ${lastUsedRegion ? `<br>Last used: ${lastUsedRegion}` : ''}
+            </div>
+        `;
+    }
+}
+
 document.getElementById("getForecastButton").addEventListener("click", async () => {
     const city = document.getElementById("cityInput").value.trim();
     const state = document.getElementById("stateInput").value.trim();
@@ -11,27 +72,22 @@ document.getElementById("getForecastButton").addEventListener("click", async () 
         citySelection.innerHTML = "";
         citySelection.style.display = "none";
     }
-    const baseUrl = "http://weatherappcs350.trafficmanager.net/api/getweatherforecast";
 
-    const apiUrl = `${baseUrl}?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&country=${encodeURIComponent(country)}`;
     try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-
-        if (!res.ok) {
-            if (output) output.innerHTML = data.error || "Error searching for city.";
-            return;
-        }
+        const data = await callWeatherAPI(city, state, country);
+        updateRoutingStatus();
 
         if (data.matches && data.matches.length > 0) {
             if (output) output.innerHTML = "";
             renderCitySelection(data.matches);
         } else if (data.forecast) {
             renderForecast(data.forecast.forecast_5day);
+        } else if (data.error) {
+            if (output) output.innerHTML = data.error;
         }
     } catch (err) {
         console.error("Error:", err);
-        if (output) output.innerHTML = "Error searching for city.";
+        if (output) output.innerHTML = "Error searching for city. Please try again.";
     }
 });
 
@@ -56,18 +112,51 @@ function renderCitySelection(matches) {
     citySelection.innerHTML = html;
     citySelection.style.display = "block";
 
-    document.getElementById("confirmCityButton").addEventListener("click", async () => {
-        const selected = document.querySelector('input[name="cityRadio"]:checked');
-        if (selected) {
-            const [lat, lon] = selected.value.split(",");
-            const apiUrl = `http://weatherappcs350.trafficmanager.net/api/getweatherforecast?lat=${lat}&lon=${lon}`;
+    const confirmButton = document.getElementById("confirmCityButton");
+    if (confirmButton) {
+        const newConfirmButton = confirmButton.cloneNode(true);
+        confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
 
-            const output = document.getElementById("forecast");
-            if (output) output.innerHTML = "Loading forecast...";
+        newConfirmButton.addEventListener("click", async () => {
+            const selected = document.querySelector('input[name="cityRadio"]:checked');
+            if (selected) {
+                const [lat, lon] = selected.value.split(",");
+                await getForecastByCoordinates(lat, lon);
+            }
+        });
+    }
+}
 
-            await fetchWeather(apiUrl);
+async function getForecastByCoordinates(lat, lon) {
+    const output = document.getElementById("forecast");
+    if (output) output.innerHTML = "Loading forecast...";
+
+    try {
+        for (let attempt = 0; attempt < REGIONS.length; attempt++) {
+            const region = REGIONS[currentRegionIndex];
+
+            try {
+                const url = `${region.url}?lat=${lat}&lon=${lon}`;
+                const response = await fetch(url);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.forecast && data.forecast.forecast_5day) {
+                        renderForecast(data.forecast.forecast_5day);
+                        updateRoutingStatus();
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.log(`Region ${region.name} failed for forecast`);
+            }
+            currentRegionIndex = (currentRegionIndex + 1) % REGIONS.length;
         }
-    });
+        throw new Error("All regions failed");
+    } catch (err) {
+        console.error("Forecast error:", err);
+        if (output) output.innerHTML = "Error fetching forecast.";
+    }
 }
 
 async function checkAuth() {
@@ -94,33 +183,6 @@ async function checkAuth() {
         return false;
     }
 }
-checkAuth();
-
-async function fetchWeather(apiUrl) {
-    const output = document.getElementById("forecast");
-    try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-
-        if (!res.ok) {
-            if (output) output.innerHTML = data.error || "Error fetching forecast.";
-            return;
-        }
-
-        if (data.forecast && data.forecast.forecast_5day) {
-            renderForecast(data.forecast.forecast_5day);
-        } else if (Array.isArray(data)) {
-            renderForecast(data);
-        } else {
-            console.error("Unexpected forecast format:", data);
-            if (output) output.innerHTML = "Unexpected forecast format received.";
-        }
-
-    } catch (err) {
-        console.error("Fetch error:", err);
-        if (output) output.innerHTML = "Error fetching forecast.";
-    }
-}
 
 function renderForecast(forecasts) {
     const output = document.getElementById("forecast");
@@ -145,3 +207,6 @@ function renderForecast(forecasts) {
         output.appendChild(div);
     });
 }
+
+checkAuth();
+updateRoutingStatus();
